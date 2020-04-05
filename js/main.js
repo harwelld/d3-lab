@@ -32,7 +32,6 @@
 
     //set up map
     function setMap(map){
-        console.log('called');
         d3.queue()
             .defer(d3.csv, "data/Census2010.csv") //load attributes from csv
             .defer(d3.json, "data/neighborhoods3.topojson") //load spatial data
@@ -115,12 +114,24 @@
             .enter()
             .append("path")
             .attr("class", function(d){
-                return "neighborhood " + d.properties.MAPLABEL;
+                //var name = d.properties.MAPLABEL
+                //name = name.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
+                return "neighborhood " + cleanName(d.properties.MAPLABEL);
             })
             .attr("d", path)
             .style("fill", function(d){
                 return choropleth(d.properties, colorScale);
+            })
+            .on("mouseover", function(d){
+                highlight(cleanName(d.properties.MAPLABEL));
+            })
+            .on("mouseout", function(d){
+                deHighlight(cleanName(d.properties.MAPLABEL));
             });
+        
+        //add desc element to keep track of style
+        var desc = neighborhoods.append("desc")
+            .text('{"stroke": "#000", "stroke-width": "1.2px"}');
     }
     
     //function to test for data value and return color
@@ -138,11 +149,11 @@
     //function to create color scale generator
     function makeColorScale(data){
         var colorClasses = [
-            "#D4B9DA",
-            "#C994C7",
-            "#DF65B0",
-            "#DD1C77",
-            "#980043"
+            "#edf8fb",
+            "#b3cde3",
+            "#8c96c6",
+            "#8856a7",
+            "#810f7c"
         ];
 
         //create color scale generator
@@ -181,9 +192,22 @@
                 return b[expressed]-a[expressed]
             })
             .attr("class", function(d){
-                return "bars " + d.Neighborhood;
+                //var name = d.Neighborhood
+                //name = name.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
+                return "bars " + cleanName(d.Neighborhood);
             })
-            .attr("width", chartInnerWidth / csvData.length - 1);
+            .attr("width", chartInnerWidth / csvData.length - 1)
+            .on("mouseover", function(d){
+                console.log(d.Neighborhood);
+                return highlight(cleanName(d.Neighborhood));
+            })
+            .on("mouseout", function(d){
+                return deHighlight(cleanName(d.Neighborhood));
+            })
+        
+        //add desc element to keep track of style
+        var desc = bars.append("desc")
+            .text('{"stroke": "none", "stroke-width": "0px"}');
 
         //create chart title
         var chartTitle = chart.append("text")
@@ -308,6 +332,39 @@
             .style("fill", function(d){
                 return choropleth(d, colorScale);
             });
+    }
+    
+    //function to highlight enumeration units and bars
+    function highlight(name){
+        var selected = d3.selectAll("." + name)
+            .style("stroke", "blue")
+            .style("stroke-width", "3");
+    };
+    
+    //function to reset the element style on mouseout
+    function deHighlight(name){
+        var selected = d3.selectAll("." + name)
+            .style("stroke", function(){
+                return getStyle(this, "stroke")
+            })
+            .style("stroke-width", function(){
+                return getStyle(this, "stroke-width")
+            });
+
+        function getStyle(element, styleName){
+            var styleText = d3.select(element)
+                .select("desc")
+                .text();
+
+            var styleObject = JSON.parse(styleText);
+
+            return styleObject[styleName];
+        };
+    }
+
+    //function to remove spaces and other characters from neighborhood names
+    function cleanName(neighborhoodName){
+        return neighborhoodName.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
     }
     
 })();
