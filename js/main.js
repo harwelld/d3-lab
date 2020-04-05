@@ -187,10 +187,12 @@
 
         //create chart title
         var chartTitle = chart.append("text")
-            .attr("x", 500)
-            .attr("y", 40)
+            .attr("x", "50%")
+            .attr("y", "40")
+            .attr("dominant-baseline", "middle")
+            .attr("text-anchor", "middle")
             .attr("class", "chartTitle")
-            .text(expressed + " By Neighborhood");
+            .text("Total Population By Neighborhood");
 
         //add y-axis
         var axis = chart.append("g")
@@ -222,9 +224,7 @@
     
     //Example 1.4 line 14...dropdown change listener handler
     function changeAttribute(attribute, csvData){
-        //change the expressed attribute
         expressed = attribute;
-        console.log(expressed);
         maxValue = getMax(csvData, expressed);
 
         //recreate the color scale
@@ -232,6 +232,8 @@
 
         //recolor enumeration units
         var neighborhoods = d3.selectAll(".neighborhood")
+            .transition()
+            .duration(1000)
             .style("fill", function(d){
                 return choropleth(d.properties, colorScale)
             });
@@ -240,7 +242,12 @@
         var bars = d3.selectAll(".bars")
             .sort(function(a, b){
                 return b[expressed] - a[expressed];
-            });
+            })
+            .transition()
+            .delay(function(d, i){
+                return i*20
+            })
+            .duration(1000);
         
         var yScale = d3.scaleLinear()
             .range([425, 0])
@@ -259,22 +266,29 @@
         bars.attr("x", function(d, i){
                 return i * (chartInnerWidth / n) + leftPadding;
             })
-            //resize bars
             .attr("height", function(d, i){
                 return chartHeight - yScale(parseFloat(d[expressed]));
             })
             .attr("y", function(d, i){
                 return yScale(parseFloat(d[expressed])) + topBottomPadding;
             })
-            //recolor bars
             .style("fill", function(d){
                 return choropleth(d, colorScale);
             });
         
+        //transition yAxis when variable changes
         d3.select("g")
             .attr("transform", translate)
-            .transition().duration(2000)
+            .transition()
+            .duration(1000)
             .call(yAxis);
+        
+        //update chart title
+        var titleArray = ["Total Population", "Owner Occupied Housing Units", "Renter Occupied Housing Units", "Males Age 20-29", "Females Age 20-29", "Total Reported Crimes in 2018"];
+        var index = attrArray.indexOf(expressed);
+        var chartTitle = d3.select(".chartTitle")
+            .transition().duration(2000)
+            .text(titleArray[index] + " By Neighborhood");
     }
     
     //create initial chart
@@ -282,14 +296,12 @@
         bars.attr("x", function(d, i){
             return i * (chartInnerWidth / n) + leftPadding;
             })
-            //resize bars
             .attr("height", function(d, i){
                 return chartHeight - yScale(parseFloat(d[expressed]));
             })
             .attr("y", function(d, i){
                 return yScale(parseFloat(d[expressed])) + topBottomPadding;
             })
-            //recolor bars
             .style("fill", function(d){
                 return choropleth(d, colorScale);
             });
