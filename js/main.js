@@ -51,7 +51,6 @@
             //create a scale to size bars proportionally to frame
             var maxValue = getMax(csvData, expressed);
             maxValue = maxValue + maxValue*.01;
-            //console.log(expressed);
             var yScale = d3.scaleLinear()
                 .range([425, 0])
                 .domain([0, maxValue]);
@@ -114,8 +113,6 @@
             .enter()
             .append("path")
             .attr("class", function(d){
-                //var name = d.properties.MAPLABEL
-                //name = name.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
                 return "neighborhood " + cleanName(d.properties.MAPLABEL);
             })
             .attr("d", path)
@@ -123,11 +120,12 @@
                 return choropleth(d.properties, colorScale);
             })
             .on("mouseover", function(d){
-                highlight(cleanName(d.properties.MAPLABEL));
+                highlight(d.properties, cleanName(d.properties.MAPLABEL));
             })
             .on("mouseout", function(d){
                 deHighlight(cleanName(d.properties.MAPLABEL));
-            });
+            })
+            .on("mousemove", moveLabel);
         
         //add desc element to keep track of style
         var desc = neighborhoods.append("desc")
@@ -192,18 +190,16 @@
                 return b[expressed]-a[expressed]
             })
             .attr("class", function(d){
-                //var name = d.Neighborhood
-                //name = name.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
                 return "bars " + cleanName(d.Neighborhood);
             })
             .attr("width", chartInnerWidth / csvData.length - 1)
             .on("mouseover", function(d){
-                console.log(d.Neighborhood);
-                return highlight(cleanName(d.Neighborhood));
+                return highlight(d, cleanName(d.Neighborhood));
             })
             .on("mouseout", function(d){
                 return deHighlight(cleanName(d.Neighborhood));
             })
+            .on("mousemove", moveLabel);
         
         //add desc element to keep track of style
         var desc = bars.append("desc")
@@ -335,11 +331,12 @@
     }
     
     //function to highlight enumeration units and bars
-    function highlight(name){
+    function highlight(props, name){
         var selected = d3.selectAll("." + name)
             .style("stroke", "blue")
             .style("stroke-width", "3");
-    };
+        setLabel(props, name);
+    }
     
     //function to reset the element style on mouseout
     function deHighlight(name){
@@ -359,12 +356,58 @@
             var styleObject = JSON.parse(styleText);
 
             return styleObject[styleName];
-        };
+        }
+        
+        //remove dynamic label
+        d3.select(".infolabel")
+            .remove();
     }
 
     //function to remove spaces and other characters from neighborhood names
     function cleanName(neighborhoodName){
         return neighborhoodName.replace(" ", "").replace(".", "").replace("'", "").replace(" ", "");
     }
+    
+    //function to create dynamic label
+    function setLabel(props, name){
+        console.log(props);
+        var labelAttribute = "<h1>" + props[expressed];// +
+            //+ "</h1><b>" + expressed + "</b>";
+
+        //create info label div
+        var infolabel = d3.select("body")
+            .append("div")
+            .attr("class", "infolabel w3-card")
+            .attr("id", name + "_label")
+            .html(labelAttribute);
+
+        var neighborhoodName = infolabel.append("div")
+            .attr("class", "labelname")
+            .html(name);
+    }
+    
+    //Example 2.8 line 1...function to move info label with mouse
+    function moveLabel(){
+        //get width of label
+        var labelWidth = d3.select(".infolabel")
+            .node()
+            .getBoundingClientRect()
+            .width;
+
+        //use coordinates of mousemove event to set label coordinates
+        var x1 = d3.event.clientX + 10,
+            y1 = d3.event.clientY - 75,
+            x2 = d3.event.clientX - labelWidth - 10,
+            y2 = d3.event.clientY + 25;
+
+        //horizontal label coordinate, testing for overflow
+        var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1; 
+        //vertical label coordinate, testing for overflow
+        var y = d3.event.clientY < 75 ? y2 : y1; 
+
+        d3.select(".infolabel")
+            .style("left", x + "px")
+            .style("top", y + "px");
+    };
     
 })();
