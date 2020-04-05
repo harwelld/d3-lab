@@ -7,9 +7,15 @@
 
     <!-- Load w3 CSS -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    
+    <!-- Load jQuery and main js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	
 	<!-- Load D3 library -->
 	<script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    <!-- Load Simple Statistics library -->
+    <script src="https://unpkg.com/simple-statistics@7.0.7/dist/simple-statistics.min.js"></script>
     
     <!-- Load TopoJSON library -->
     <script src="https://unpkg.com/topojson@3"></script>
@@ -27,9 +33,13 @@
     </header>
 
     <!-- Map Container -->
-    <div id="map" class="w3-container">
+    <div id="map-container" class="w3-container">
+        <div id="map"></div>
     </div>
     
+    <!-- Chart Container -->
+    <div id="chart" class="w3-container w3-card w3-margin-top"></div>
+
     <!-- About Section -->
     <footer class="w3-padding-64 w3-center" id="Credits">
         <h3>Credits</h3>
@@ -38,8 +48,7 @@
 
 </div>
 
-<!-- Load jQuery and main js -->
-<!-- <script type="text/javascript" src="lib/jquery-3.4.1.js"></script> -->
+
 <script type="text/javascript" src="js/main.js"></script>
 
 </body>
