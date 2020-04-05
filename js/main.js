@@ -233,7 +233,10 @@
         //recolor enumeration units
         var neighborhoods = d3.selectAll(".neighborhood")
             .transition()
-            .duration(1000)
+            .delay(function(d, i){
+                return i*20
+            })
+            .duration(500)
             .style("fill", function(d){
                 return choropleth(d.properties, colorScale)
             });
@@ -247,7 +250,7 @@
             .delay(function(d, i){
                 return i*20
             })
-            .duration(1000);
+            .duration(500);
         
         var yScale = d3.scaleLinear()
             .range([425, 0])
