@@ -62,6 +62,14 @@
             var yAxis = d3.axisLeft()
                 .scale(yScale)
             
+            //create list of neighborhood names for autocomplete
+            var nameList = [];
+            for (var i=0; i<csvData.length; i++){
+                var csvNeighborhood = csvData[i].Neighborhood;
+                nameList.push(cleanName(csvNeighborhood));
+            };
+            console.log(nameList);
+            
             //join csv data to neighborhoods feature
             pdx_neighborhoods = joinData(pdx_neighborhoods, csvData);
             
@@ -79,6 +87,11 @@
             
             //create search bar
             createSearch(csvData);
+            
+            //use jQuery autocomplete
+            $("#searchBox").autocomplete({
+                source: nameList
+            });
         }
     }
     
@@ -255,7 +268,8 @@
     function createSearch(csvData) {
         var search = d3.select("#map")
             .append("input")
-            .attr("class", " search w3-input")
+            .attr("class", "search w3-input ui-widget")
+            .attr("id", "searchBox")
             .attr("placeholder", "Search by Neighborhood")
             .on("keyup", function(event){
                 if (window.event.keyCode === 13) {

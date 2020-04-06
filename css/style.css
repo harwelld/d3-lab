@@ -50,7 +50,7 @@
 .dropdown {
     float: right;
     position: relative;
-    top: -440px;
+    top: -490px;
     z-index: 100000;
     font-family: sans-serif;
     font-size: 1em;
@@ -64,7 +64,7 @@
     float: right;
     width: 251px;
     position: relative;
-    top: -525px;
+    top: -15px;
     margin-left: 450px;
     z-index: 1000000;
     font-family: sans-serif;
