@@ -257,6 +257,11 @@
             .append("input")
             .attr("class", " search w3-input")
             .attr("placeholder", "Search by Neighborhood")
+            .on("keyup", function(event){
+                if (window.event.keyCode === 13) {
+                    console.log("clicked enter!");
+                }
+            });
     }
     
     //Example 1.4 line 14...dropdown change listener handler
