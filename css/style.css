@@ -43,15 +43,13 @@
 
 .axis text {
     font-family: sans-serif;
-    
     fill: #999;
 }
 
 .dropdown {
     float: right;
     position: relative;
-    top: -490px;
-    z-index: 100000;
+    top: -488px;
     font-family: sans-serif;
     font-size: 1em;
     padding: 8px; 
@@ -61,13 +59,30 @@
     border-style: solid;
     border-width: 1px;
     border-color: #a9a9a9;
-    float: right;
-    width: 251px;
-    position: relative;
-    top: -15px;
-    margin-left: 450px;
+    width: 225px;
     z-index: 1000000;
     font-family: sans-serif;
+    margin-left: 295px;
+}
+
+.buttonGo {
+    border-style: solid;
+    border-width: 1px;
+    border-left-width: 0;
+    border-color: #a9a9a9;
+    margin-bottom: 2px;
+}
+
+.buttonX {
+    border-style: solid;
+    border-width: 1px;
+    border-left-width: 0;
+    border-color: #a9a9a9;
+    margin-bottom: 2px;
+}
+
+#search-container {
+    padding-bottom: 15px;
 }
 
 .infolabel {

@@ -16,7 +16,7 @@
     
     //chart sizing variables
     var chartWidth = window.innerWidth * 0.65,
-        chartHeight = 425,
+        chartHeight = 350,
         leftPadding = 50,
         rightPadding = 2,
         topBottomPadding = -6,
@@ -45,7 +45,7 @@
 
             //create Albers equal area conic projection centered on Portland
             var projection = d3.geoAlbers()
-                .center([-2.53, 45.5465])
+                .center([-2.535, 45.56])
                 .rotate([120, 0, 0])
                 .scale(110000);
             var path = d3.geoPath()
@@ -53,9 +53,9 @@
 
             //create a scale to size bars proportionally to frame
             var maxValue = getMax(csvData, expressed);
-            maxValue = maxValue + maxValue*.02;
+            maxValue = maxValue + maxValue*.03;
             var yScale = d3.scaleLinear()
-                .range([425, 0])
+                .range([350, 0])
                 .domain([0, maxValue]);
             
             //create vertical axis generator
@@ -68,7 +68,6 @@
                 var csvNeighborhood = csvData[i].Neighborhood;
                 nameList.push(cleanName(csvNeighborhood));
             };
-            console.log(nameList);
             
             //join csv data to neighborhoods feature
             pdx_neighborhoods = joinData(pdx_neighborhoods, csvData);
@@ -139,7 +138,7 @@
                 return choropleth(d.properties, colorScale);
             })
             .on("mouseover", function(d){
-                highlight(d.properties, cleanName(d.properties.MAPLABEL));
+                highlight(d.properties, cleanName(d.properties.MAPLABEL), true);
             })
             .on("mouseout", function(d){
                 deHighlight(cleanName(d.properties.MAPLABEL));
@@ -213,7 +212,7 @@
             })
             .attr("width", chartInnerWidth / csvData.length - 1)
             .on("mouseover", function(d){
-                return highlight(d, cleanName(d.Neighborhood));
+                return highlight(d, cleanName(d.Neighborhood), true);
             })
             .on("mouseout", function(d){
                 return deHighlight(cleanName(d.Neighborhood));
@@ -266,15 +265,59 @@
     
     //function create smart search box
     function createSearch(csvData) {
-        var search = d3.select("#map")
-            .append("input")
-            .attr("class", "search w3-input ui-widget")
+        //keep track of what's highlighted
+        var highlighted = [];
+        
+        //add w3-row to hold search bar and buttons
+        var w3row = d3.select("#map")
+            .append("div")
+            .attr("class", "w3-cell-row")
+            .attr("id", "search-container");
+        
+        w3row.append("input")
+            .attr("class", "search w3-cell w3-input ui-widget")
             .attr("id", "searchBox")
             .attr("placeholder", "Search by Neighborhood")
             .on("keyup", function(event){
                 if (window.event.keyCode === 13) {
-                    console.log("clicked enter!");
+                    if (highlighted.length > 0) {
+                        for (var i=0; i<highlighted.length; i++) {
+                            deHighlight(highlighted[i]);
+                        }
+                        highlighted = [];
+                    }
+                    highlight(csvData, this.value, false);
+                    highlighted.push($("#searchBox").val());
                 }
+            });
+        
+        w3row.append("button")
+            .attr("class", "buttonGo w3-cell w3-button w3-white")
+            .html("Go")
+            .on("click", function(){
+                if ($("#searchBox").val().length > 0) {
+                    if (highlighted.length > 0) {
+                        for (var i=0; i<highlighted.length; i++) {
+                            deHighlight(highlighted[i]);
+                        }
+                        highlighted = [];
+                    }
+                    highlight(csvData, $("#searchBox").val(), false);
+                    highlighted.push($("#searchBox").val());
+                }
+            });
+        
+        w3row.append("button")
+            .attr("class", "buttonX w3-cell w3-button w3-white")
+            .html("X")
+            .on("click", function(){
+                if (highlighted.length > 0) {
+                    for (var i=0; i<highlighted.length; i++) {
+                        deHighlight(highlighted[i]);
+                    }
+                    highlighted = [];
+                }
+                $("#searchBox").val("");
             });
     }
     
@@ -282,7 +325,7 @@
     function changeAttribute(attribute, csvData){
         expressed = attribute;
         maxValue = getMax(csvData, expressed);
-        maxValue = maxValue + maxValue*.02;
+        maxValue = maxValue + maxValue*.03;
 
         //recreate the color scale
         var colorScale = makeColorScale(csvData);
@@ -310,7 +353,7 @@
             .duration(500);
         
         var yScale = d3.scaleLinear()
-            .range([425, 0])
+            .range([350, 0])
             .domain([0, maxValue]);
             
         //create vertical axis generator
@@ -367,11 +410,13 @@
     }
     
     //function to highlight enumeration units and bars
-    function highlight(props, name){
+    function highlight(props, name, label=true){
         var selected = d3.selectAll("." + name)
             .style("stroke", "blue")
             .style("stroke-width", "3");
-        setLabel(props, name);
+        if (label){
+            setLabel(props, name);
+        }
     }
     
     //function to reset the element style on mouseout
@@ -406,7 +451,6 @@
     
     //function to create dynamic label
     function setLabel(props, name){
-        console.log(props);
         var labelAttribute = "<h1>" + props[expressed];// +
             //+ "</h1><b>" + expressed + "</b>";
 
