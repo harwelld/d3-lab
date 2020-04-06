@@ -5,6 +5,9 @@
     var attrArray = ["TotalPop", "Owner_HU", "Renter_HU", "Males_20s", "Females_20", "TotalCrimes18"];
     var expressed = attrArray[0];
     
+    //friendly attribute names
+    var titleArray = ["Total Population", "Owner Occupied Housing Units", "Renter Occupied Housing Units", "Males Age 20-29", "Females Age 20-29", "Total Reported Crimes in 2018"];
+    
     //create new svg container for the map
     var map = d3.select("#map")
         .append("svg")
@@ -73,6 +76,9 @@
             
             //create dropdown menu
             createDropdown(csvData);
+            
+            //create search bar
+            createSearch(csvData);
         }
     }
     
@@ -239,7 +245,18 @@
             .enter()
             .append("option")
             .attr("value", function(d){ return d })
-            .text(function(d){ return d });
+            .text(function(d){ 
+                var index = attrArray.indexOf(d);
+                return titleArray[index];
+            });
+    }
+    
+    //function create smart search box
+    function createSearch(csvData) {
+        var search = d3.select("#map")
+            .append("input")
+            .attr("class", " search w3-input")
+            .attr("placeholder", "Search by Neighborhood")
     }
     
     //Example 1.4 line 14...dropdown change listener handler
@@ -307,7 +324,6 @@
             .call(yAxis);
         
         //update chart title
-        var titleArray = ["Total Population", "Owner Occupied Housing Units", "Renter Occupied Housing Units", "Males Age 20-29", "Females Age 20-29", "Total Reported Crimes in 2018"];
         var index = attrArray.indexOf(expressed);
         var chartTitle = d3.select(".chartTitle")
             .transition().duration(2000)
@@ -386,7 +402,7 @@
             .html(name);
     }
     
-    //Example 2.8 line 1...function to move info label with mouse
+    //function to move info label with mouse
     function moveLabel(){
         //get width of label
         var labelWidth = d3.select(".infolabel")
