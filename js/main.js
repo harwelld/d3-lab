@@ -53,7 +53,7 @@
 
             //create a scale to size bars proportionally to frame
             var maxValue = getMax(csvData, expressed);
-            maxValue = maxValue + maxValue*.01;
+            maxValue = maxValue + maxValue*.02;
             var yScale = d3.scaleLinear()
                 .range([425, 0])
                 .domain([0, maxValue]);
@@ -263,6 +263,7 @@
     function changeAttribute(attribute, csvData){
         expressed = attribute;
         maxValue = getMax(csvData, expressed);
+        maxValue = maxValue + maxValue*.02;
 
         //recreate the color scale
         var colorScale = makeColorScale(csvData);
